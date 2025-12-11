@@ -31,29 +31,25 @@ const getUploadPage = asyncHandler(async (req, res) => {
 const createPsPost = asyncHandler(async (req, res) => {
     const { postText } = req.body;
     
-    // 디버깅 코드 (이제 필요 없으면 제거하셔도 됩니다)
     console.log("--- req.file 내용 ---");
     console.log(req.file);
     console.log("-----------------------");
-    
-    // req.file에는 Cloudinary에 업로드된 정보가 들어있습니다.
+
     if (!req.file || !postText) {
         res.status(400);
         
-        // 🚨 CRITICAL FIX 1: 롤백 시 req.file.filename을 사용합니다.
         if (req.file && req.file.filename) { 
-             await cloudinary.uploader.destroy(req.file.filename); // public_id 대신 filename 사용
+             await cloudinary.uploader.destroy(req.file.filename); 
              console.log(`Cloudinary 롤백 완료: ${req.file.filename}`);
         } 
         
         throw new Error("이미지 파일과 텍스트를 모두 입력해야 합니다.");
     }
 
-    // 🚨 CRITICAL FIX 2: PsPost 생성 시 req.file.filename을 publicId로 전달합니다.
     const newPsPost = await PsPost.create({
         userId: req.user.id,
         imagePath: req.file.path || req.file.secure_url, 
-        publicId: req.file.filename, // <-- public_id 대신 filename 사용!
+        publicId: req.file.filename, 
         postText: postText
     });
     
@@ -73,14 +69,11 @@ const getMyPosts = asyncHandler(async (req, res) => {
 });
 
 // 좋아요 목록 뷰
-// 좋아요 목록 뷰
 const getLikesPage = asyncHandler(async (req, res) => {
     const userId = req.user.id;
     
-    // 🚨 FIX 1: postId 대신 스키마 필드 이름인 'psPostId'를 선택합니다.
     const likedRecords = await Like.find({ userId: userId }).select('psPostId'); 
     
-    // 🚨 FIX 2: record.postId 대신 record.psPostId를 사용합니다.
     const likedPostIds = likedRecords.map(record => record.psPostId);
     
     if (!likedPostIds.length) {
@@ -103,12 +96,9 @@ const getLikesPage = asyncHandler(async (req, res) => {
 });
 
 // 좋아요 상태
-// controllers/psController.js (toggleLike 함수)
-
-// 좋아요 상태
 const toggleLike = asyncHandler(async (req, res) => {
     const userId = req.user.id;
-    const postId = req.params.id; // URL 파라미터는 게시물 ID
+    const postId = req.params.id; 
 
     const post = await PsPost.findById(postId); 
 
@@ -116,35 +106,28 @@ const toggleLike = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: "게시물을 찾을 수 없습니다." });
     }
 
-    // 🚨 FIX 1: 중복된 Like.findOne() 호출을 제거하고,
-    // 스키마 필드 이름인 'psPostId'를 사용하여 좋아요 기록을 찾습니다.
     const likeRecord = await Like.findOne({ 
         userId: userId, 
-        psPostId: postId // <--- 스키마 필드 이름 사용
+        psPostId: postId 
     });
     
     let message = "";
     let isLiked = false;
 
     if (likeRecord) {
-        // 좋아요 취소 (삭제)
-        // 🚨 FIX 2: 삭제 시에도 스키마 필드 이름인 'psPostId'를 사용합니다.
         await Like.deleteOne({ userId, psPostId: postId }); 
         
         message = "좋아요가 취소되었습니다.";
         isLiked = false;
         post.likes = Math.max(0, post.likes - 1); 
     } else {
-        // 좋아요 생성
-        // 🚨 CRITICAL FIX 3: 생성 시에도 스키마 필드 이름인 'psPostId'를 사용합니다.
         await Like.create({ userId, psPostId: postId }); 
         
         message = "게시물에 좋아요를 눌렀습니다.";
         isLiked = true;
-        post.likes += 1; // 카운트 증가
+        post.likes += 1; 
     }
 
-    // PsPost 모델의 likes 필드 업데이트 저장
     await post.save();  
 
     res.status(200).json({ 
@@ -203,11 +186,9 @@ const deletePsPost = asyncHandler(async (req, res) => {
         throw new Error("게시물을 삭제할 권한이 없습니다.");
     }
     
-    // 🚨 FIX 2.3: Cloudinary 삭제 로직 적용 (로컬 fs 로직은 주석 처리 또는 제거)
     if (post.publicId) {
         await cloudinary.uploader.destroy(post.publicId);
     } else {
-        // publicId가 DB에 없을 경우 URL에서 추출하여 삭제 시도 (선택 사항: 이전 버전 호환용)
         const imagePath = post.imagePath;
         if (imagePath && imagePath.startsWith('http')) {
             const urlParts = imagePath.split('/');
@@ -249,8 +230,6 @@ const deletePsPost = asyncHandler(async (req, res) => {
 const getPsPostDetails = asyncHandler(async (req, res) => {
     const postId = req.params.id;
     
-    // Mongoose가 여기서 ObjectId 캐스팅 오류를 냅니다.
-    // 하지만 올바른 ID가 전달되면 게시물을 찾습니다.
     const post = await PsPost.findById(postId).populate('userId', 'name');
 
     if (!post) {
