@@ -5,7 +5,8 @@ const User = require('../models/userModel');
 const path = require('path');
 const PsPost = require('../models/psPostModel');
 const Like = require('../models/likeModel'); 
-const fs = require('fs'); 
+// const fs = require('fs'); 
+const cloudinary = require('cloudinary').v2;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const asyncHandler = require("express-async-handler");
@@ -414,28 +415,59 @@ exports.createUser = asyncHandler(async (req, res) => {
 /**
  * DELETE /admin/posts/:id - 특정 게시물 삭제 처리
  */
-exports.deletePost = asyncHandler(async (req, res, next) => {
+exports.deletePsPost = asyncHandler(async (req, res, next) => {
     try {
-        const postId = req.params.id;
-        
-        const post = await Post.findById(postId);
-        
-        if (!post) {
-            req.flash('error', '삭제할 게시물을 찾을 수 없습니다.');
-            return res.redirect('/admin/posts');
-        }
+        const psPostId = req.params.id;
+        const deletedPost = await PsPost.findById(psPostId); // findByIdAndDelete 대신 findById로 변경
 
-        await Post.findByIdAndDelete(postId);
-        
-        req.flash('success', '게시물이 성공적으로 삭제되었습니다.');
-        res.redirect('/admin/posts');
-        
+        if (!deletedPost) {
+            req.flash('error', '삭제할 P.S. 게시물을 찾을 수 없습니다.');
+        } else {
+            const imagePath = deletedPost.imagePath; // Cloudinary URL
+
+            // 💡 Cloudinary 삭제 로직 적용
+            if (imagePath && imagePath.startsWith('http')) {
+                const urlParts = imagePath.split('/');
+                const publicIdWithFormat = urlParts.slice(-2).join('/'); 
+                const publicId = publicIdWithFormat.split('.')[0]; 
+                
+                await cloudinary.uploader.destroy(publicId);
+                console.log(`P.S. 게시물 이미지 Cloudinary 삭제 완료: ${publicId}`);
+            }
+            
+            // DB에서 게시물 삭제
+            await PsPost.deleteOne({ _id: psPostId });
+
+            req.flash('success', 'P.S. 게시물이 성공적으로 삭제되었습니다.');
+        }
+        res.redirect('/admin/ps-posts');
     } catch (err) {
-        console.error("Error deleting post:", err);
-        req.flash('error', '게시물 삭제 중 오류가 발생했습니다.');
-        next(err);
+        console.error("Error deleting PsPost by admin:", err);
+        next(err); 
     }
 });
+// exports.deletePost = asyncHandler(async (req, res, next) => {
+//     try {
+//         const postId = req.params.id;
+        
+//         const post = await Post.findById(postId);
+        
+//         if (!post) {
+//             req.flash('error', '삭제할 게시물을 찾을 수 없습니다.');
+//             return res.redirect('/admin/posts');
+//         }
+
+//         await Post.findByIdAndDelete(postId);
+        
+//         req.flash('success', '게시물이 성공적으로 삭제되었습니다.');
+//         res.redirect('/admin/posts');
+        
+//     } catch (err) {
+//         console.error("Error deleting post:", err);
+//         req.flash('error', '게시물 삭제 중 오류가 발생했습니다.');
+//         next(err);
+//     }
+// });
 
 // ======================================
 // Admin Login (관리자 로그인 처리) - POST /admin
