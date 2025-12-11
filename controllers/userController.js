@@ -4,6 +4,7 @@ const User = require('../models/userModel');
 const PsPost = require("../models/psPostModel");
 const Like = require("../models/likeModel");
 const jwt = require("jsonwebtoken");
+const Post = require('../models/PostModel');
 
 
 // @desc    사용자 등록 (회원가입)

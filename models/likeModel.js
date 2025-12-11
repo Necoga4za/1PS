@@ -9,16 +9,21 @@ const likeSchema = mongoose.Schema({
         ref: 'User',
     },
 
-    postId: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: 'PsPost',
+    // postId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     required: true,
+    //     ref: 'PsPost',
+    // },
+    psPostId: {
+        type: Schema.Types.ObjectId,
+        ref: 'PsPost', 
+        required: true 
     },
 }, {
     timestamps: true,
 });
 
 
-likeSchema.index({ userId: 1, postId: 1 }, { unique: true });
+likeSchema.index({ userId: 1, psPostId: 1 }, { unique: true });
 
 module.exports = mongoose.model("Like", likeSchema);

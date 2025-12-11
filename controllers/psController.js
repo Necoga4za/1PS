@@ -4,7 +4,7 @@ const User = require("../models/userModel");
 const Like = require("../models/likeModel");
 // const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
-
+const Post = require('../models/PostModel');
 
 // @desc    1 P.S. 메인 페이지 뷰
 // @route   GET /
@@ -34,51 +34,38 @@ const createPsPost = asyncHandler(async (req, res) => {
     if (!req.file || !postText) {
         res.status(400);
         
-        // 💡💡💡 수정: 로컬 fs.unlinkSync 제거, Cloudinary 롤백 로직 추가
-        if (req.file && req.file.public_id) {
-            await cloudinary.uploader.destroy(req.file.public_id);
-            console.log(`Cloudinary 롤백: ${req.file.public_id} 삭제됨.`);
-        }
-        
+        if (req.file && req.file.public_id) { 
+             await cloudinary.uploader.destroy(req.file.public_id);
+             console.log(`Cloudinary 롤백 완료: ${req.file.public_id}`);
+        } 
+
         throw new Error("이미지 파일과 텍스트를 모두 입력해야 합니다.");
     }
+    // if (!req.file || !postText) {
+    //     res.status(400);
+    //     if (req.file) {
+    //         fs.unlinkSync(req.file.path);
+    //     }
+    //     throw new Error("이미지 파일과 텍스트를 모두 입력해야 합니다.");
+    // }
     
-    // 💡💡💡 핵심: Cloudinary URL (req.file.path) 저장 확인
-    const newPsPost = await PsPost.create({
-        userId: req.user.id,
-        imagePath: req.file.path, // req.file.path에는 Cloudinary URL이 들어 있습니다.
-        postText,
+    const userId = req.user.id; 
+    const imagePath = `/uploads/${req.file.filename}`; 
+
+    const psPost = await PsPost.create({
+        userId,
+        imagePath,
+        postText
     });
 
-    res.redirect('/');
+    if (psPost) {
+        res.status(201).redirect('/'); 
+    } else {
+        fs.unlinkSync(req.file.path);
+        res.status(500);
+        throw new Error("게시글 저장에 실패했습니다.");
+    }
 });
-
-
-// const createPsPost = asyncHandler(async (req, res) => {
-//     const { postText } = req.body;
-    
-//     if (!req.file || !postText) {
-//         res.status(400);
-//         if (req.file) {
-//             fs.unlinkSync(req.file.path);
-//         }
-//         throw new Error("이미지 파일과 텍스트를 모두 입력해야 합니다.");
-//     }
-
-//     const psPost = await PsPost.create({
-//        userId,
-//         imagePath,
-//         postText,
-//     });
-
-//     if (psPost) {
-//         res.status(201).redirect('/'); 
-//     } else {
-//         fs.unlinkSync(req.file.path);
-//         res.status(500);
-//         throw new Error("게시글 저장에 실패했습니다.");
-//     }
-// });
 
 
 // 내 게시물 목록
@@ -190,59 +177,40 @@ const updatePsPost = asyncHandler(async (req, res) => {
 });
 
 
-// @desc    게시물 삭제 (Cloudinary 로직)
+// 게시물 삭제
 // @route   DELETE /posts/:id
 const deletePsPost = asyncHandler(async (req, res) => {
     const postId = req.params.id;
+
     const post = await PsPost.findById(postId);
 
     if (!post) {
         res.status(404);
         throw new Error("게시물을 찾을 수 없습니다.");
     }
+
     if (post.userId.toString() !== req.user.id) {
         res.status(403);
         throw new Error("게시물을 삭제할 권한이 없습니다.");
     }
-
-    const imagePath = post.imagePath;
-
-    if (imagePath && imagePath.startsWith('http')) {
-        try {
-            const urlParts = imagePath.split('/');
-            const publicIdWithFormat = urlParts.slice(-2).join('/'); 
-            const publicId = publicIdWithFormat.split('.')[0]; 
-
-            await cloudinary.uploader.destroy(publicId);
-            console.log(`Cloudinary 파일 삭제 완료: ${publicId}`);
-
-        } catch (error) {
-            console.error("Cloudinary 파일 삭제 중 오류 발생:", error.message);
-        }
+    
+    if (post.publicId) { // publicId 필드가 모델에 있다면 이것을 사용
+        await cloudinary.uploader.destroy(post.publicId);
     } else {
-        console.log(`경고: Cloudinary URL이 아닙니다. 파일 삭제를 건너뛰고 DB 기록만 삭제합니다.`);
+        // publicId가 누락된 경우 imagePath(URL)에서 public ID 추출
+        const imagePath = post.imagePath;
+        if (imagePath && imagePath.startsWith('http')) {
+            const urlParts = imagePath.split('/');
+            const publicIdWithFolder = urlParts.slice(-2).join('/').split('.')[0]; 
+            await cloudinary.uploader.destroy(publicIdWithFolder);
+        }
     }
     
-    await Like.deleteMany({ postId: postId });
-    await PsPost.deleteOne({ _id: postId });
+    await Like.deleteMany({ psPostId: postId }); // 좋아요 삭제
+    await PsPost.deleteOne({ _id: postId }); // 게시물 삭제
 
     res.status(200).json({ message: "게시물이 성공적으로 삭제되었습니다." });
 });
-// const deletePsPost = asyncHandler(async (req, res) => {
-//     const postId = req.params.id;
-
-//     const post = await PsPost.findById(postId);
-    
-
-//     if (!post) {
-//         res.status(404);
-//         throw new Error("게시물을 찾을 수 없습니다.");
-//     }
-
-//     if (post.userId.toString() !== req.user.id) {
-//         res.status(403);
-//         throw new Error("게시물을 삭제할 권한이 없습니다.");
-//     }
 
 //     const imagePath = post.imagePath.startsWith('/uploads/')
 //         ? post.imagePath.substring('/uploads/'.length)
