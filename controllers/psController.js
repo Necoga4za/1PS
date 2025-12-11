@@ -2,7 +2,9 @@ const asyncHandler = require("express-async-handler");
 const PsPost = require("../models/psPostModel");
 const User = require("../models/userModel");
 const Like = require("../models/likeModel");
-const fs = require('fs');
+// const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+
 
 // @desc    1 P.S. 메인 페이지 뷰
 // @route   GET /
@@ -41,9 +43,9 @@ const createPsPost = asyncHandler(async (req, res) => {
     const imagePath = `/uploads/${req.file.filename}`; 
 
     const psPost = await PsPost.create({
-        userId,
-        imagePath,
-        postText
+       userId: req.user.id,
+        imagePath: req.file.path,
+        postText,
     });
 
     if (psPost) {
@@ -167,11 +169,13 @@ const updatePsPost = asyncHandler(async (req, res) => {
 
 // 게시물 삭제
 // @route   DELETE /posts/:id
+// @desc    게시물 삭제
+// @route   DELETE /posts/:id
 const deletePsPost = asyncHandler(async (req, res) => {
     const postId = req.params.id;
 
     const post = await PsPost.findById(postId);
-
+    
     if (!post) {
         res.status(404);
         throw new Error("게시물을 찾을 수 없습니다.");
@@ -182,18 +186,24 @@ const deletePsPost = asyncHandler(async (req, res) => {
         throw new Error("게시물을 삭제할 권한이 없습니다.");
     }
 
-    const imagePath = post.imagePath.startsWith('/uploads/')
-        ? post.imagePath.substring('/uploads/'.length)
-        : null;
+    const imagePath = post.imagePath;
 
-    if (imagePath) {
-        const fullPath = `./public/uploads/${imagePath}`;
-        if (fs.existsSync(fullPath)) {
-            fs.unlinkSync(fullPath);
-            console.log(`파일 삭제 완료: ${fullPath}`);
-        } else {
-            console.log(`경고: 파일을 찾을 수 없습니다: ${fullPath}`);
+    if (imagePath && imagePath.startsWith('http')) {
+        try {
+            const urlParts = imagePath.split('/');
+            
+            const publicIdWithFormat = urlParts.slice(-2).join('/'); 
+            
+            const publicId = publicIdWithFormat.split('.')[0]; 
+
+            await cloudinary.uploader.destroy(publicId);
+            console.log(`Cloudinary 파일 삭제 완료: ${publicId}`);
+
+        } catch (error) {
+            console.error("Cloudinary 파일 삭제 중 오류 발생 (진행 계속):", error.message);
         }
+    } else {
+        console.log(`경고: Cloudinary URL이 아닙니다. 파일 삭제를 건너뛰고 DB 기록만 삭제합니다.`);
     }
     
     await Like.deleteMany({ postId: postId });
@@ -202,6 +212,42 @@ const deletePsPost = asyncHandler(async (req, res) => {
 
     res.status(200).json({ message: "게시물이 성공적으로 삭제되었습니다." });
 });
+// const deletePsPost = asyncHandler(async (req, res) => {
+//     const postId = req.params.id;
+
+//     const post = await PsPost.findById(postId);
+    
+
+//     if (!post) {
+//         res.status(404);
+//         throw new Error("게시물을 찾을 수 없습니다.");
+//     }
+
+//     if (post.userId.toString() !== req.user.id) {
+//         res.status(403);
+//         throw new Error("게시물을 삭제할 권한이 없습니다.");
+//     }
+
+//     const imagePath = post.imagePath.startsWith('/uploads/')
+//         ? post.imagePath.substring('/uploads/'.length)
+//         : null;
+
+//     if (imagePath) {
+//         const fullPath = `./public/uploads/${imagePath}`;
+//         if (fs.existsSync(fullPath)) {
+//             fs.unlinkSync(fullPath);
+//             console.log(`파일 삭제 완료: ${fullPath}`);
+//         } else {
+//             console.log(`경고: 파일을 찾을 수 없습니다: ${fullPath}`);
+//         }
+//     }
+    
+//     await Like.deleteMany({ postId: postId });
+
+//     await PsPost.deleteOne({ _id: postId });
+
+//     res.status(200).json({ message: "게시물이 성공적으로 삭제되었습니다." });
+// });
 
 
 module.exports = {
