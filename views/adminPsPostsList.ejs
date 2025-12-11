@@ -35,7 +35,7 @@
                         <% psPosts.forEach(post => { %>
                             <tr>
                                 <td><%= post._id.toString().substring(0, 4) %>...</td>
-                                <td><a href="<%= post.imagePath %>" target="_blank"><%= post.imagePath %></a></td>
+                                <td class="image-path-cell"><a href="<%= post.imagePath %>" target="_blank"><%= post.imagePath %></a></td>
                                 <td><%= post.postText.substring(0, 30) + (post.postText.length > 30 ? '...' : '') %></td>
                                 <td><%= post.userId ? post.userId.name : '알 수 없음' %></td>
                                 <td><%= post.createdAt.toLocaleDateString('ko-KR') %></td>
