@@ -1,0 +1,227 @@
+/* ==================================== */
+/* 1. 기본 및 레이아웃 스타일 (main.css 기반) */
+/* ==================================== */
+:root {
+    --color-light-grey: #D9D9D9;
+    --font-size-nav: 32px;
+    --font-size-logo: 128px;
+    --font-family-main: 'Crimson Text', serif;
+    --layout-padding: 210px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: white;
+    font-family: var(--font-family-main);
+    color: black;
+}
+
+.main-header {
+    width: 100%;
+    padding: 51px var(--layout-padding) 0 0; 
+    display: flex;
+    justify-content: flex-end; 
+}
+
+.nav-links a {
+    color: inherit;
+    font-size: var(--font-size-nav);
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 50px; 
+    white-space: nowrap;
+}
+
+.content-area {
+    padding-left: var(--layout-padding);
+    padding-top: 114px; 
+}
+
+.logo {
+    font-size: var(--font-size-logo);
+    font-weight: 700;
+    margin-bottom: 120px; 
+}
+
+/* Grid Layout */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    padding-right: var(--layout-padding); /* 오른쪽 여백 추가 */
+}
+
+.grid-item {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.media-placeholder {
+    width: 100%;
+    /* 그리드 아이템의 높이를 너비에 맞춰 정사각형에 가깝게 설정 */
+    padding-top: 100%; 
+    position: relative;
+}
+
+.placeholder-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sentence {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 50px; 
+    height: 50px;
+    z-index: 5;
+    /* paper.png 아이콘이 보이도록 처리 */
+}
+.sentence-icon {
+    width: 100%;
+    height: 100%;
+}
+
+
+/* ==================================== */
+/* 2. 모달창 스타일 (메인 페이지 스타일 재활용) */
+/* ==================================== */
+
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0, 0, 0, 0.6); 
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto; 
+    width: 90%; 
+    max-width: 700px; 
+    min-height: 450px; 
+    padding: 30px; 
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.3);
+    position: relative;
+    border-radius: 8px;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 20px; 
+    color: #555; 
+    font-size: 35px;
+    font-weight: 300; 
+    cursor: pointer;
+    line-height: 20px;
+    z-index: 1010; 
+}
+.close-button:hover {
+    color: black;
+}
+
+#modal-image {
+    width: 100%;
+    height: auto;
+    max-height: 400px; 
+    object-fit: contain; 
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+/* 액션 영역 */
+.modal-actions {
+    padding: 10px 0;
+    border-top: 1px solid #eee;
+}
+
+/* 문구 표시 영역 */
+#modal-sentence-display {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 20px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* 수정 폼 스타일 */
+#edit-form {
+    margin-bottom: 10px;
+}
+#edit-textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    resize: vertical;
+    font-size: 1rem;
+}
+
+/* 버튼 스타일: 수정/삭제 */
+.action-buttons-wrapper {
+    display: flex;
+    justify-content: flex-end; 
+    gap: 15px;
+}
+
+.action-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.action-button.edit {
+    background-color: #3f7988; /* 수정 버튼 색상 */
+    color: white;
+}
+.action-button.edit:hover {
+    background-color: #315e69;
+}
+
+.action-button.delete {
+    background-color: #d9534f; /* 삭제 버튼 색상 */
+    color: white;
+}
+.action-button.delete:hover {
+    background-color: #c9302c;
+}
+
+.action-button.save {
+    background-color: #5cb85c; /* 저장 버튼 (수정 폼 내부) */
+    color: white;
+    margin-right: 10px;
+}
+.action-button.save:hover {
+    background-color: #4cae4c;
+}
+
+.action-button.cancel {
+    background-color: #f0ad4e; /* 취소 버튼 (수정 폼 내부) */
+    color: white;
+}
+.action-button.cancel:hover {
+    background-color: #ec971f;
+}

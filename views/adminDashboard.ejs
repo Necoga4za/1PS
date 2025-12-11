@@ -1,0 +1,49 @@
+<%- include('./include/_header_admin', {title: 'Admin Dashboard', cssFile: 'admin'}) %>
+
+<main class="content-area admin-area admin-layout"> 
+    
+     <nav class="admin-sidebar">
+        <h2 class="sidebar-title">빠른 이동</h2>
+        <ul class="sidebar-menu">
+            <li><a href="/admin" class="sidebar-link <%= (path === '/admin') ? 'active' : '' %>">🏠 대시보드</a></li>
+            <li><a href="/admin/users" class="sidebar-link <%= (path === '/admin/users') ? 'active' : '' %>">👥 사용자 관리</a></li>
+            <li><a href="/admin/ps-posts" class="sidebar-link <%= (path === '/admin/ps-posts') ? 'active' : '' %>">📸 P.S. 게시물 관리</a></li>
+            <li><a href="/admin/likes" class="sidebar-link <%= (path === '/admin/likes') ? 'active' : '' %>">❤️ 좋아요 관리</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content-area">
+        <h1 class="logo">관리자 대시보드</h1>
+        
+        <% if (successMessage && successMessage.length > 0) { %>
+            <p class="flash-message success"><%= successMessage %></p>
+        <% } %>
+        <% if (errorMessage && errorMessage.length > 0) { %>
+            <p class="flash-message error"><%= errorMessage %></p>
+        <% } %>
+
+        <div class="dashboard-widgets">
+            
+            <div class="widget total-users">
+                <h2>총 사용자 수</h2>
+                <p class="data-number"><%= dashboardData.totalUsers || 'N/A' %></p>
+            </div>
+    
+            <div class="widget total-likes">
+                <h2>총 좋아요 수</h2>
+                <p class="data-number"><%= dashboardData.totalLikesPosts || 'N/A' %></p>
+            </div>
+            
+            <div class="widget total-psposts">
+                <h2>총 P.S. 게시물 수</h2>
+                <p class="data-number"><%= dashboardData.totalPSPosts || 'N/A' %></p>
+            </div>
+            
+        
+
+        </div>
+        
+        </div>
+</main>
+
+<%- include('./include/_footer') %>

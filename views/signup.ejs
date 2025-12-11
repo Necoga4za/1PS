@@ -1,0 +1,56 @@
+<%- include('./include/_header', {title: '1 P.S. Main', cssFile: 'signup'}) %>
+
+    <main class="content-area">
+        <h1 class="logo">Sign Up</h1> 
+
+        <div class="login-container">
+            <form class="login-form" action="/signup" method="post">
+                <% 
+                    const _enteredData = enteredData || {};
+                    const _errorMessage = errorMessage || '';
+                    %>
+                    <% if (_errorMessage) { %>
+                        <p class="error-message" style="color: #f44336; font-size: 0.8rem; text-align: center; margin-bottom: 15px;font-family: Arial, sans-serif; ">
+                        <%= _errorMessage %>
+                        </p>
+                <% } %>
+                
+                <div class="input-group">
+                    <label for="name-input">Nick name :</label>
+                    <input type="text" id="name-input" name="name" value="<%= _enteredData.name || '' %>" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="email-input">Email :</label>
+                    <input type="email" id="email-input" name="email" value="<%= _enteredData.email || '' %>" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="phone-input">Phone :</label>
+                    <input type="tel" id="phone-input" name="phone" value="<%= _enteredData.phone || '' %>" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="password-input">Password :</label>
+                    <input type="password" id="password-input" name="password" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="confirm-password-input">Confirm password :</label>
+                    <input type="password" id="confirm-password-input" name="confirmPassword" required>
+                </div>
+
+               
+
+                <div class="button-group">
+                    <a href="/login" class="login-button">Login</a> 
+                    <button type="submit" class="sign-up-button">Sign Up</button> 
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+
+
+    <%- include('./include/_footer') %>

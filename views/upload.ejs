@@ -1,0 +1,31 @@
+<%- include('./include/_header', {title: 'UPLOAD P.S.', cssFile: 'upload'}) %>
+
+    <main class="content-area">
+        <h1 class="logo">Upload P.S</h1>
+
+        <form class="upload-form" action="/submit-upload" method="post" enctype="multipart/form-data">
+            
+            <div class="upload-container">
+                <div class="image-upload-area">
+                    <label for="image-file" class="upload-label">
+                        <span style="font-family: Arial, sans-serif;" class="placeholder-text">이미지 업로드 영역 (클릭)</span>
+                        <input type="file" id="image-file" name="imageFile" accept="image/*" required>
+                    </label>
+                    <img id="image-preview" src="#" alt="미리보기 이미지" style="display: none;">
+                </div>
+
+                <div class="text-input-area">
+                    <textarea id="post-text" name="postText" placeholder="당신의 P.S.를 여기에 적어주세요..." required></textarea>
+                </div>
+            </div>
+
+            <div class="button-area">
+                <button type="submit" class="upload-button">업로드 하기</button>
+            </div>
+        </form>
+        </main>
+
+    <script src="/js/upload.js"></script>
+
+
+    <%- include('./include/_footer') %>

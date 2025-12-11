@@ -1,0 +1,65 @@
+<%- include('./include/_header_admin', {title: 'userUpdate', cssFile: 'admin'}) %>
+<main class="content-area admin-area admin-layout">
+
+     <nav class="admin-sidebar">
+        <h2 class="sidebar-title">빠른 이동</h2>
+        <ul class="sidebar-menu">
+            <li><a href="/admin" class="sidebar-link <%= (path === '/admin') ? 'active' : '' %>">🏠 대시보드</a></li>
+            <li><a href="/admin/users" class="sidebar-link <%= (path === '/admin/users') ? 'active' : '' %>">👥 사용자 관리</a></li>
+            <li><a href="/admin/ps-posts" class="sidebar-link <%= (path === '/admin/ps-posts') ? 'active' : '' %>">📸 P.S. 게시물 관리</a></li>
+            <li><a href="/admin/likes" class="sidebar-link <%= (path === '/admin/likes') ? 'active' : '' %>">❤️ 좋아요 관리</a></li>
+        </ul>
+    </nav>
+
+
+
+<div class="main-content-area">
+        <h1 class="logo">사용자 수정</h1>
+
+    <div class="button-box">
+        <a href="/admin/users" class="btn btn-light"><i class="fa-solid fa-list"></i>
+        사용자 목록</a>
+    </div>
+
+    <div class="form-container">
+    <form action="/admin/users/<%= user._id %>?_method=PUT" method="POST" id="update-user" class="form-box">
+
+    <p>사용자 정보를 수정합니다.</p>
+    
+    
+        <div class="user-info">
+            <div class="col-12">
+                <label for="name" class="col-form-label">Nick name : </label>
+                <div>
+                    <input type="text" class="form-control" name="name" id="name" value="<%= user.name%>">
+                </div>
+            </div>
+            
+            <div class="col-12">
+                <label for="email" class="col-form-label">Email : </label>
+                <div>
+                    <input type="text" class="form-control" name="email" id="email" value="<%= user.email %>">
+                </div>
+            </div>
+            
+            <div class="col-12">
+                <label for="phone" class="col-form-label">Phone : </label>
+                <div>
+                    <input type="text" class="form-control" name="phone" id="phone" value="<%= user.phone %>">
+                </div>
+            </div>
+            
+            <div class="col-12">
+                <label for="password" class="col-form-label">Password : </label>
+                <div>
+                    <input type="password" class="form-control" name="password" id="password" 
+                        placeholder="변경할 때만 입력하세요">
+                </div>
+            </div>
+
+            <button class="edit-button" type="submit"> 수정 </button> </div>
+    </form>
+    </div>
+    </div>
+</main>
+<%- include('./include/_footer') %>

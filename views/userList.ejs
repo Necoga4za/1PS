@@ -1,0 +1,65 @@
+<%- include('./include/_header_admin', {title: '사용자 목록 관리', cssFile: 'admin'}) %>  
+
+<main class="content-area admin-area admin-layout">
+
+     <nav class="admin-sidebar">
+        <h2 class="sidebar-title">빠른 이동</h2>
+        <ul class="sidebar-menu">
+            <li><a href="/admin" class="sidebar-link <%= (path === '/admin') ? 'active' : '' %>">🏠 대시보드</a></li>
+            <li><a href="/admin/users" class="sidebar-link <%= (path === '/admin/users') ? 'active' : '' %>">👥 사용자 관리</a></li>
+            <li><a href="/admin/ps-posts" class="sidebar-link <%= (path === '/admin/ps-posts') ? 'active' : '' %>">📸 P.S. 게시물 관리</a></li>
+            <li><a href="/admin/likes" class="sidebar-link <%= (path === '/admin/likes') ? 'active' : '' %>">❤️ 좋아요 관리</a></li>
+        </ul>
+    </nav>
+
+
+
+<div class="main-content-area">
+        <h1 class="logo">사용자 목록 관리</h1>
+    <div class="posts-list-container">         
+        <div class="action-bar">             
+            <a href="/admin/users/add" class="button add-button">                 
+                <i class="fa-solid fa-user-plus"></i> 새 사용자 추가
+            </a>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                   <th>이름</th>
+                   <th>이메일</th>
+                   <th>전화번호</th>
+                   <th class="actions-icons">관리</th>                 
+                </tr>
+            </thead>
+            <tbody>
+                <% if (users && users.length > 0) { %>
+                    <% users.forEach(user => { %> 
+                        <tr>
+                            <td><%= user.name %></td>
+                            <td><%= user.email %></td>
+                            <td><%= user.phone %></td>
+                            <td class="actions-icons">
+                                <a href="/admin/users/<%= user._id %>" title="수정" class="button edit-button">
+                                    수정
+                                </a>
+                                
+                                <form action="/admin/users/<%= user._id %>?_method=DELETE" method="POST" style="display:inline" onsubmit="return confirm('정말로 이 사용자를 삭제하시겠습니까?');">
+                                    <button type="submit" title="삭제" class="button delete-button">
+                                        삭제
+                                    </button>
+                                </form>
+                            </td>
+                        </tr> 
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                         <td colspan="4" class="text-center">등록된 사용자가 없습니다.</td>
+                     </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+    </div>
+</main>
+<%- include('./include/_footer') %>

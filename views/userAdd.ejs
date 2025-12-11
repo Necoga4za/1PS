@@ -1,0 +1,75 @@
+<%- include('./include/_header_admin', {title: '사용자 추가', cssFile: 'admin'}) %>
+<main class="content-area admin-area admin-layout">
+
+     <nav class="admin-sidebar">
+        <h2 class="sidebar-title">빠른 이동</h2>
+        <ul class="sidebar-menu">
+            <li><a href="/admin" class="sidebar-link <%= (path === '/admin') ? 'active' : '' %>">🏠 대시보드</a></li>
+            <li><a href="/admin/users" class="sidebar-link <%= (path === '/admin/users') ? 'active' : '' %>">👥 사용자 관리</a></li>
+            <li><a href="/admin/ps-posts" class="sidebar-link <%= (path === '/admin/ps-posts') ? 'active' : '' %>">📸 P.S. 게시물 관리</a></li>
+            <li><a href="/admin/likes" class="sidebar-link <%= (path === '/admin/likes') ? 'active' : '' %>">❤️ 좋아요 관리</a></li>
+        </ul>
+    </nav>
+
+<div class="main-content-area">
+    <h1 class="logo">사용자 추가</h1>
+   <div class="button-box">
+        <a href="/admin/users" class="btn btn-light"><i class="fa-solid fa-list"></i>
+        사용자 목록</a>
+    </div>
+    
+     <% 
+         // 뷰로 전달된 enteredData를 사용하여 로컬 변수를 초기화합니다.
+         const _enteredData = enteredData || {}; 
+          const _errorMessage = errorMessage || '';
+    %>
+    
+    <% if (_errorMessage) { %>
+        <p class="flash-message error"><%= _errorMessage %></p>
+    <% } %>
+
+    <div class="form-container">
+        <form action="/admin/users" method="POST" id="add-user" class="form-box">
+             <p>새로운 사용자를 추가합니다.</p>
+            <div class="user-info">
+                
+                <div class="col-12">
+                    <label for="name" class="col-form-label">Nick Name : </label>
+                    <div>
+                        <input type="text" class="form-control" name="name" id="name" placeholder="수연" value="<%= _enteredData.name || '' %>" required>
+                    </div>
+                </div>
+                
+                <div class="col-12">
+                    <label for="email" class="col-form-label">Email : </label>
+                    <div>
+                         <input type="email" class="form-control" name="email" id="email" placeholder="user@example.com" value="<%= _enteredData.email || '' %>" required>
+                    </div>
+                </div> 
+                
+                <div class="col-12">
+                    <label for="phone" class="col-form-label">Phone : </label>
+                    <div>
+                         <input type="text" class="form-control" name="phone" id="phone" placeholder="010-1234-5678" value="<%= _enteredData.phone || '' %>">
+                    </div>
+                </div>
+                
+                <div class="col-12">
+                    <label for="password" class="col-form-label">Password : </label>
+                    <div>
+                        <input type="password" class="form-control" name="password" id="password" placeholder="비밀번호" required>
+                    </div>
+                </div>
+                
+                <div class="button-group" style="margin-top: 30px;">
+                    <button type="submit" class="button primary-button"> 사용자 등록 </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+
+</div>
+</main>
+<%- include('./include/_footer') %>

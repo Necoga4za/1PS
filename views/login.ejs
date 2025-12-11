@@ -1,0 +1,36 @@
+<%- include('./include/_header', {title: 'Login P.S.', cssFile: 'login'}) %>
+
+    <main class="content-area">
+        <h1 class="logo">Login</h1> 
+
+        <div class="login-container">
+            <form class="login-form" action="/login" method="post">
+                
+                <div class="input-group">
+                    <label for="email-input">Email :</label>
+                    <input type="email" id="email-input" name="email" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="password-input">Password :</label>
+                    <input type="password" id="password-input" name="password" required>
+                </div>
+
+                 <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+                    <p class="error-message" style="color: #f44336; font-size: 0.8rem; text-align: center; margin-bottom: 15px;font-family: Arial, sans-serif;">
+                        <%= errorMessage %>
+                    </p>
+                <% } %>
+                
+                <div class="button-group">
+                <a href="/signup" class="sign-up-button">Sign Up</a>
+                <button type="submit" class="login-button">Login</button>
+                </div>
+
+            </form>
+        </div>
+        </main>
+
+    <!-- <script src="/js/login.js"></script>  -->
+    
+<%- include('./include/_footer') %>

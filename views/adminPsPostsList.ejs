@@ -1,0 +1,64 @@
+<%- include('./include/_header', {title: 'P.S. 게시물 목록 관리', cssFile: 'admin'}) %>
+
+<main class="content-area admin-area admin-layout"> 
+    
+    <nav class="admin-sidebar">
+        <h2 class="sidebar-title">빠른 이동</h2>
+        <ul class="sidebar-menu">
+            <li><a href="/admin" class="sidebar-link <%= (path === '/admin') ? 'active' : '' %>">🏠 대시보드</a></li>
+            <li><a href="/admin/users" class="sidebar-link <%= (path === '/admin/users') ? 'active' : '' %>">👥 사용자 관리</a></li>
+            <li><a href="/admin/ps-posts" class="sidebar-link <%= (path === '/admin/ps-posts') ? 'active' : '' %>">📸 P.S. 게시물 관리</a></li>
+            <li><a href="/admin/likes" class="sidebar-link <%= (path === '/admin/likes') ? 'active' : '' %>">❤️ 좋아요 관리</a></li>
+        </ul>
+    </nav>
+    <div class="main-content-area">
+        <h1 class="logo">P.S. 게시물 목록 관리</h1>
+
+        <p class="action-bar" style="margin-bottom: 20px;">
+            현재 시스템에 기록된 모든 P.S. 게시물 (이미지+텍스트) 기록을 관리합니다.
+        </p>
+
+        <div class="posts-list-container">
+            <% if (psPosts && psPosts.length > 0) { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID (앞 4자리)</th>
+                            <th>이미지 경로</th>
+                            <th>텍스트 (앞 30자)</th>
+                            <th>작성자</th>
+                            <th>작성일</th>
+                            <th>관리</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% psPosts.forEach(post => { %>
+                            <tr>
+                                <td><%= post._id.toString().substring(0, 4) %>...</td>
+                                <td><a href="<%= post.imagePath %>" target="_blank"><%= post.imagePath %></a></td>
+                                <td><%= post.postText.substring(0, 30) + (post.postText.length > 30 ? '...' : '') %></td>
+                                <td><%= post.userId ? post.userId.name : '알 수 없음' %></td>
+                                <td><%= post.createdAt.toLocaleDateString('ko-KR') %></td>
+                                
+                                <td class="action-buttons">
+                                    <a href="/admin/ps-posts/<%= post._id %>" class="button edit-button">수정</a>
+                                    
+                                    <form action="/admin/ps-posts/<%= post._id %>?_method=DELETE" method="POST" 
+                                        style="display:inline;" 
+                                        onsubmit="return confirm('정말로 이 P.S. 게시물을 삭제하시겠습니까? 관련 좋아요 기록도 삭제됩니다.');">
+                                        <button type="submit" class="button delete-button">삭제</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <p class="no-data">등록된 P.S. 게시물이 없습니다.</p>
+            <% } %>
+        </div>
+
+    </div>
+</main>
+
+<%- include('./include/_footer') %>

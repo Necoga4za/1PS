@@ -1,0 +1,60 @@
+<%- include('./include/_header_admin', {title: 'P.S. 게시물 수정', cssFile: 'admin'}) %>
+
+<main class="content-area admin-area admin-layout"> 
+     <nav class="admin-sidebar">
+        <h2 class="sidebar-title">빠른 이동</h2>
+        <ul class="sidebar-menu">
+            <li><a href="/admin" class="sidebar-link <%= (path === '/admin') ? 'active' : '' %>">🏠 대시보드</a></li>
+            <li><a href="/admin/users" class="sidebar-link <%= (path === '/admin/users') ? 'active' : '' %>">👥 사용자 관리</a></li>
+            <li><a href="/admin/ps-posts" class="sidebar-link <%= (path === '/admin/ps-posts') ? 'active' : '' %>">📸 P.S. 게시물 관리</a></li>
+            <li><a href="/admin/likes" class="sidebar-link <%= (path === '/admin/likes') ? 'active' : '' %>">❤️ 좋아요 관리</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content-area">
+    <h1 class="logo">P.S. 게시물 수정</h1>
+
+    <div class="form-container post-form-container">
+        <form class="post-form" action="/admin/ps-posts/<%= post._id %>?_method=PUT" method="POST">
+            
+            <% 
+               // 수정 페이지 로드 시 기존 게시물 데이터를 먼저 보여주고, 에러 발생 시 입력 데이터(_enteredData)를 우선적으로 보여줍니다.
+               const _defaultData = post || {};
+               const _enteredData = enteredData || {};
+               const _errorMessage = errorMessage || '';
+            %>
+            
+            <% if (_errorMessage) { %>
+                <p class="error-message"><%= _errorMessage %></p>
+            <% } %>
+
+            <div class="input-group">
+                <label>작성자:</label>
+                <p class="readonly-value"><%= _defaultData.userId ? _defaultData.userId.name : '탈퇴 사용자' %></p>
+            </div>
+            
+            <div class="input-group">
+                <label>게시된 이미지:</label>
+                <% if (_defaultData.imagePath) { %>
+                    <img src="<%= _defaultData.imagePath %>" alt="게시물 이미지" style="max-width: 200px; display: block; margin-top: 10px; border: 1px solid #ccc;">
+                <% } else { %>
+                    <p class="readonly-value">이미지 없음</p>
+                <% } %>
+                <p style="font-size: 0.8rem; color: #777;">* 이미지는 수정할 수 없습니다.</p>
+            </div>
+
+            <div class="input-group">
+                <label for="postText-input">내용:</label>
+                <textarea id="postText-input" name="postText" rows="10" required><%= _enteredData.postText || _defaultData.postText %></textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="button primary-button">수정 완료</button>
+                <a href="/admin/ps-posts" class="button secondary-button">목록으로 돌아가기</a>
+            </div>
+        </form>
+    </div>
+    </div>
+</main>
+
+<%- include('./include/_footer') %>

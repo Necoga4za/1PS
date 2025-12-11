@@ -1,0 +1,53 @@
+<%- include('./include/_header_admin', {title: '새 게시물 추가', cssFile: 'admin'}) %>
+<main class="content-area admin-area admin-layout"> 
+     <nav class="admin-sidebar">
+        <h2 class="sidebar-title">빠른 이동</h2>
+        <ul class="sidebar-menu">
+            <li><a href="/admin" class="sidebar-link <%= (path === '/admin') ? 'active' : '' %>">🏠 대시보드</a></li>
+            <li><a href="/admin/users" class="sidebar-link <%= (path === '/admin/users') ? 'active' : '' %>">👥 사용자 관리</a></li>
+            <li><a href="/admin/ps-posts" class="sidebar-link <%= (path === '/admin/ps-posts') ? 'active' : '' %>">📸 P.S. 게시물 관리</a></li>
+            <li><a href="/admin/likes" class="sidebar-link <%= (path === '/admin/likes') ? 'active' : '' %>">❤️ 좋아요 관리</a></li>
+        </ul>
+    </nav>
+
+    
+    <div class="main-content-area">
+    <h1 class="logo">새 게시물 추가</h1>
+
+    <div class="form-container post-form-container">
+        <form class="post-form" action="/admin/posts" method="POST">
+            
+            <% 
+               const _enteredData = enteredData || {};
+               const _errorMessage = errorMessage || '';
+            %>
+            
+            <% if (_errorMessage) { %>
+                <p class="error-message"><%= _errorMessage %></p>
+            <% } %>
+
+            <div class="input-group">
+                <label for="title-input">제목:</label>
+                <input type="text" id="title-input" name="title" value="<%= _enteredData.title || '' %>" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="category-input">카테고리 (선택 사항):</label>
+                <input type="text" id="category-input" name="category" value="<%= _enteredData.category || '' %>" placeholder="예: 개발, 일상, 정보">
+            </div>
+
+            <div class="input-group">
+                <label for="content-input">내용:</label>
+                <textarea id="content-input" name="content" rows="15" required><%= _enteredData.content || '' %></textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="button primary-button">게시물 등록</button>
+                <a href="/admin/posts" class="button secondary-button">목록으로 돌아가기</a>
+            </div>
+        </form>
+    </div>
+     </div>
+</main>
+
+<%- include('./include/_footer') %>

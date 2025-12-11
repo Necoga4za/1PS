@@ -1,0 +1,54 @@
+<%- include('./include/_header', {title: 'My Posts'}) %>
+    
+    <main class="content-area">
+        <h1 class="logo">My Posts</h1>
+
+        <section class="grid-container">
+            <% if (posts && posts.length > 0) { %>
+                <% posts.forEach(post => { %>
+                    <div class="grid-item" data-post-id="<%= post._id %>" data-sentence-text="<%= post.postText %>"> 
+                        <div class="media-placeholder">
+                            <img src="<%= post.imagePath %>" alt="게시물 이미지" class="placeholder-image">
+                        </div>
+                        
+                        <div class="grid-sentence-wrapper">
+                            <img src="/img/paper.png" alt="종이 배경" class="sentence-paper-img">
+                            <div class="sentence-text"><%= post.postText %></div>
+                        </div>
+                        
+                        </div>
+                <% }) %>
+            <% } else { %>
+                <p style="text-align: center; width: 100%; font-family: Arial, sans-serif;">아직 업로드한 게시물이 없습니다.<br>당신의 P.S.를 공유해보세요!</p>
+            <% } %>
+        </section>
+    </main>
+    
+    <div id="myPostModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span> 
+            
+            <div class="modal-body">
+                
+                <img id="my-modal-image" src="" alt="확대 이미지">
+                
+                <div id="my-sentence-and-text-wrapper">
+                    <div id="my-modal-user-text" class="user-text">여기에 텍스트가 표시됩니다.</div>
+                    <img src="/img/paper.png" alt="종이 배경" class="sentence-paper-img"> 
+                </div>
+
+                <div class="edit-area">
+                    <textarea id="edit-textarea" placeholder="수정할 내용을 입력하세요" style="width: 100%; height: 100px; margin-top: 10px;"></textarea>
+                    <button id="save-edit-button" class="action-button save">수정 저장</button>
+                    <button id="cancel-edit-button" class="action-button cancel">수정 취소</button>
+                </div>
+                
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button id="edit-mode-button" class="action-button edit">📝 수정하기</button>
+                    <button id="delete-post-button" class="action-button delete">🗑️ 삭제하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/main.js"></script> 
+<%- include('./include/_footer') %>

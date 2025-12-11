@@ -1,0 +1,31 @@
+<%- include('./include/_header', {title: 'Liked Posts'}) %>
+    
+    <main class="content-area">
+        <h1 class="logo">Liked Posts</h1>
+
+        <section class="grid-container">
+            <% if (posts && posts.length > 0) { %>
+                <% posts.forEach(post => { %>
+                    <div class="grid-item" data-post-id="<%= post._id %>" data-sentence-text="<%= post.postText %>"> 
+                        <div class="media-placeholder">
+                            <img src="<%= post.imagePath %>" alt="게시물 이미지" class="placeholder-image">
+                        </div>
+                        
+                        <div class="grid-sentence-wrapper">
+                            <img src="/img/paper.png" alt="종이 배경" class="sentence-paper-img">
+                            <div class="sentence-text"><%= post.postText %></div>
+                        </div>
+                        
+                        <div class="post-actions" style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                             <button class="action-button unlike-post" data-post-id="<%= post._id %>">💔 좋아요 취소</button>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p style="text-align: center; width: 100%; font-family: Arial, sans-serif;">좋아요를 누른 게시물이 아직 없습니다.</p>
+            <% } %>
+        </section>
+    </main>
+    
+    <script src="/js/main.js"></script> 
+<%- include('./include/_footer') %>

@@ -1,0 +1,115 @@
+<%- include('./include/_header', {title: '1 P.S.'}) %>
+
+    <main class="content-area">
+        <h1 class="logo">1 P.S.</h1>
+
+        <section class="grid-container">
+            <% 
+                // 1. 하드코딩된 샘플 게시물 데이터 정의
+                const staticPosts = [
+                    { 
+                        _id: 'static1', 
+                        imagePath: '/img/파리커플.jpg', 
+                        postText: 'We built a small, perfect silence between us in the heart of the bustling city.' 
+                    },
+                    { 
+                        _id: 'static2', 
+                        imagePath: '/img/파리서점.jpg', 
+                        postText: 'Every old bookstore is a quiet labyrinth where time slows down to the pace of turning pages.' 
+                    },
+                    { 
+                        _id: 'static3', 
+                        imagePath: '/img/파리옷.jpg', 
+                        postText: 'The choice was simple: be stylishly lost, or hopelessly found.' 
+                    },
+                    { 
+                        _id: 'static4', 
+                        imagePath: '/img/파리지하철.jpg', 
+                        postText: 'Beneath the city, the metro cars carry the weight of countless unfinished journeys.' 
+                    },
+                    { 
+                        _id: 'static5', 
+                        imagePath: '/img/파리꽃.jpg', 
+                        postText: 'A single bloom is a vibrant promise that spring always remembers to arrive.' 
+                    },
+                    { 
+                        _id: 'static6', 
+                        imagePath: '/img/파리버터.jpg', 
+                        postText: 'Sometimes, the deepest comfort is found in the simple, golden richness of butter on bread.' 
+                    },
+                    { 
+                        _id: 'static7', 
+                        imagePath: '/img/파리산책.jpg', 
+                        postText: 'Wandering without a map is the best way to let the city whisper its secrets to your soul.' 
+                    },
+                    { 
+                        _id: 'static8', 
+                        imagePath: '/img/파리핫초코.jpg', 
+                        postText: 'Holding the warmth of a moment, I let the rich sweetness melt away the cold.' 
+                    },
+                    { 
+                        _id: 'static9', 
+                        imagePath: '/img/파리노부ㅜㅂ.jpg', 
+                        postText: 'The sunset over the Seine painted the sky in hues too beautiful for any word.' 
+                    },
+                    { 
+                        _id: 'static10', 
+                        imagePath: '/img/파리당근.jpg', 
+                        postText: 'The humble, earthy harvest reminds us that beauty doesn\'t always need to be polished.' 
+                    }
+                ];
+
+                // 2. 동적 게시물(DB)과 정적 게시물을 결합하여 하나의 배열로 만듭니다.
+                // Dynamic Posts(posts)가 먼저 오도록 하여 최신 게시물이 상단에 표시됩니다.
+                const allPosts = (posts || []).concat(staticPosts);
+            %>
+
+            <% if (allPosts && allPosts.length > 0) { %>
+                <% allPosts.forEach(post => { %>
+                    <div class="grid-item" data-post-id="<%= post._id %>" data-sentence-text="<%= post.postText %>"> 
+                        <div class="media-placeholder">
+                            <img src="<%= post.imagePath %>" alt="게시물 이미지" class="placeholder-image">
+                        </div>
+                        
+                        <div class="grid-sentence-wrapper">
+                            <img src="/img/paper.png" alt="종이 배경" class="sentence-paper-img">
+
+                            <div class="sentence-text"><%= post.postText %></div>
+                        </div>
+                        
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p style="text-align: center; width: 100%;">아직 업로드된 게시물이 없습니다. 당신의 P.S.를 공유해보세요!</p>
+            <% } %>
+            
+        </section>
+
+    </main>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span> 
+            
+            <div class="modal-body">
+                
+                <img id="modal-image" src="" alt="확대 이미지">
+                
+                <div id="sentence-and-text-wrapper">
+                    
+                    <div id="modal-user-text" class="user-text">여기에 텍스트가 표시됩니다.</div>
+                    
+                    <img src="/img/paper.png" alt="종이 배경" class="sentence-paper-img"> 
+                </div>
+
+                <div class="modal-actions">
+                    <div id="modal-sentence-text"></div> 
+                    <button id="like-button" class="action-button like">❤️ 좋아요</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/main.js"></script> 
+
+<%- include('./include/_footer') %>
