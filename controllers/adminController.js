@@ -1,6 +1,6 @@
 // controllers/adminController.js
 
-const Post = require('../models/Post'); 
+
 const User = require('../models/userModel');
 const path = require('path');
 const PsPost = require('../models/psPostModel');

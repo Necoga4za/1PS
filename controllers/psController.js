@@ -33,29 +33,52 @@ const createPsPost = asyncHandler(async (req, res) => {
     
     if (!req.file || !postText) {
         res.status(400);
-        if (req.file) {
-            fs.unlinkSync(req.file.path);
+        
+        // 💡 Cloudinary에 이미 업로드된 파일이 있다면 즉시 삭제 (롤백)
+        if (req.file && req.file.public_id) {
+            await cloudinary.uploader.destroy(req.file.public_id);
+            console.log(`Cloudinary 롤백: ${req.file.public_id} 삭제됨.`);
         }
+        
+        // 💡 이전에 있던 로컬 파일 삭제 fs.unlinkSync(req.file.path) 코드는 제거해야 합니다.
         throw new Error("이미지 파일과 텍스트를 모두 입력해야 합니다.");
     }
     
-    const userId = req.user.id; 
-    const imagePath = `/uploads/${req.file.filename}`; 
-
-    const psPost = await PsPost.create({
-       userId: req.user.id,
-        imagePath: req.file.path,
+    // 💡💡💡 핵심 수정: imagePath에 Cloudinary URL 저장 💡💡💡
+    const newPsPost = await PsPost.create({
+        userId: req.user.id,
+        imagePath: req.file.path, // CloudinaryStorage 사용 시, req.file.path가 전체 URL입니다.
         postText,
     });
 
-    if (psPost) {
-        res.status(201).redirect('/'); 
-    } else {
-        fs.unlinkSync(req.file.path);
-        res.status(500);
-        throw new Error("게시글 저장에 실패했습니다.");
-    }
+    res.redirect('/');
 });
+
+// const createPsPost = asyncHandler(async (req, res) => {
+//     const { postText } = req.body;
+    
+//     if (!req.file || !postText) {
+//         res.status(400);
+//         if (req.file) {
+//             fs.unlinkSync(req.file.path);
+//         }
+//         throw new Error("이미지 파일과 텍스트를 모두 입력해야 합니다.");
+//     }
+
+//     const psPost = await PsPost.create({
+//        userId,
+//         imagePath,
+//         postText,
+//     });
+
+//     if (psPost) {
+//         res.status(201).redirect('/'); 
+//     } else {
+//         fs.unlinkSync(req.file.path);
+//         res.status(500);
+//         throw new Error("게시글 저장에 실패했습니다.");
+//     }
+// });
 
 
 // 내 게시물 목록
