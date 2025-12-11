@@ -34,25 +34,25 @@ const createPsPost = asyncHandler(async (req, res) => {
     if (!req.file || !postText) {
         res.status(400);
         
-        // 💡 Cloudinary에 이미 업로드된 파일이 있다면 즉시 삭제 (롤백)
+        // 💡💡💡 수정: 로컬 fs.unlinkSync 제거, Cloudinary 롤백 로직 추가
         if (req.file && req.file.public_id) {
             await cloudinary.uploader.destroy(req.file.public_id);
             console.log(`Cloudinary 롤백: ${req.file.public_id} 삭제됨.`);
         }
         
-        // 💡 이전에 있던 로컬 파일 삭제 fs.unlinkSync(req.file.path) 코드는 제거해야 합니다.
         throw new Error("이미지 파일과 텍스트를 모두 입력해야 합니다.");
     }
     
-    // 💡💡💡 핵심 수정: imagePath에 Cloudinary URL 저장 💡💡💡
+    // 💡💡💡 핵심: Cloudinary URL (req.file.path) 저장 확인
     const newPsPost = await PsPost.create({
         userId: req.user.id,
-        imagePath: req.file.path, // CloudinaryStorage 사용 시, req.file.path가 전체 URL입니다.
+        imagePath: req.file.path, // req.file.path에는 Cloudinary URL이 들어 있습니다.
         postText,
     });
 
     res.redirect('/');
 });
+
 
 // const createPsPost = asyncHandler(async (req, res) => {
 //     const { postText } = req.body;
@@ -190,20 +190,16 @@ const updatePsPost = asyncHandler(async (req, res) => {
 });
 
 
-// 게시물 삭제
-// @route   DELETE /posts/:id
-// @desc    게시물 삭제
+// @desc    게시물 삭제 (Cloudinary 로직)
 // @route   DELETE /posts/:id
 const deletePsPost = asyncHandler(async (req, res) => {
     const postId = req.params.id;
-
     const post = await PsPost.findById(postId);
-    
+
     if (!post) {
         res.status(404);
         throw new Error("게시물을 찾을 수 없습니다.");
     }
-
     if (post.userId.toString() !== req.user.id) {
         res.status(403);
         throw new Error("게시물을 삭제할 권한이 없습니다.");
@@ -214,23 +210,20 @@ const deletePsPost = asyncHandler(async (req, res) => {
     if (imagePath && imagePath.startsWith('http')) {
         try {
             const urlParts = imagePath.split('/');
-            
             const publicIdWithFormat = urlParts.slice(-2).join('/'); 
-            
             const publicId = publicIdWithFormat.split('.')[0]; 
 
             await cloudinary.uploader.destroy(publicId);
             console.log(`Cloudinary 파일 삭제 완료: ${publicId}`);
 
         } catch (error) {
-            console.error("Cloudinary 파일 삭제 중 오류 발생 (진행 계속):", error.message);
+            console.error("Cloudinary 파일 삭제 중 오류 발생:", error.message);
         }
     } else {
         console.log(`경고: Cloudinary URL이 아닙니다. 파일 삭제를 건너뛰고 DB 기록만 삭제합니다.`);
     }
     
     await Like.deleteMany({ postId: postId });
-
     await PsPost.deleteOne({ _id: postId });
 
     res.status(200).json({ message: "게시물이 성공적으로 삭제되었습니다." });
