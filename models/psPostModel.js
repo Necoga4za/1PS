@@ -15,7 +15,7 @@ const psPostSchema = mongoose.Schema({
         required: true
     },
 
-    // 🚨 FIX 1: publicId가 필수로 정의되어 있어야 합니다.
+
     publicId: {
         type: String,
         required: true 

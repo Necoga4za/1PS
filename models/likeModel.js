@@ -11,7 +11,7 @@ const likeSchema = mongoose.Schema({
         ref: 'User',
     },
     
-    // 🚨 FIX 1: 'postId' 필드는 완전히 제거하고 'psPostId'만 남깁니다.
+
     psPostId: { 
         type: Schema.Types.ObjectId,
         ref: 'PsPost', 
@@ -21,7 +21,7 @@ const likeSchema = mongoose.Schema({
     timestamps: true,
 });
 
-// 🚨 FIX 2: 인덱스도 'psPostId'로 통일합니다.
+
 likeSchema.index({ userId: 1, psPostId: 1 }, { unique: true }); 
 
 module.exports = mongoose.model("Like", likeSchema);
