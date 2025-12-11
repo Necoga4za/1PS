@@ -24,6 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let currentMyPostId = null;
 
+    // 💡 MongoDB ObjectId 유효성을 검사하는 헬퍼 함수 추가
+    function isValidObjectId(id) {
+        // MongoDB ObjectId는 24자리의 16진수 문자열입니다.
+        // 'static1' 같은 문자열은 false를 반환합니다.
+        return id && /^[0-9a-fA-F]{24}$/.test(id);
+    }
+
 
     // --- 1. 1ps.ejs (메인 페이지) 로직: 모달 열기 및 좋아요 ---
     // 💡 gridItems와 모달 요소가 모두 존재할 때만 실행
@@ -58,17 +65,18 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 💡 1ps.ejs 모달의 '좋아요' 버튼 클릭 이벤트 (TypeError 방지)
     if (likeButton) {
-        likeButton.addEventListener('click', async () => {
-            if (!currentPostId) {
-                alert("게시물 정보를 찾을 수 없습니다.");
-                return;
-            }
-            await toggleLikeStatus(currentPostId, true); // isFromMainPage: true
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        });
-    }
+    likeButton.addEventListener('click', async () => {
+        if (!currentPostId || !isValidObjectId(currentPostId)) { // 🚨 유효성 검사 추가
+            alert("유효한 게시물 정보를 찾을 수 없습니다. (정적 게시물은 좋아요를 지원하지 않습니다.)");
+            if (modal) { modal.style.display = 'none'; }
+            return;
+        }
+        await toggleLikeStatus(currentPostId, true); // isFromMainPage: true
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    });
+}
     // ---------------------------------------------------
 
 
@@ -144,7 +152,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('수정할 내용을 입력해주세요.');
                 return;
             }
-
+            
+            // 🚨 유효성 검사 추가
+            if (!currentMyPostId || !isValidObjectId(currentMyPostId)) {
+                alert("유효한 게시물 정보를 찾을 수 없어 수정할 수 없습니다.");
+                myPostModal.style.display = 'none';
+                return;
+            }
             const isUpdated = await updatePost(currentMyPostId, newText);
             
             if (isUpdated) {
@@ -161,13 +175,19 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // '삭제하기' 버튼 클릭 시
         deletePostButton.addEventListener('click', async () => {
+            // 🚨 유효성 검사 추가
+            if (!currentMyPostId || !isValidObjectId(currentMyPostId)) {
+                alert("유효한 게시물 정보를 찾을 수 없어 삭제할 수 없습니다.");
+                myPostModal.style.display = 'none';
+                return;
+            }
+            
             if (confirm("정말 이 게시물을 삭제하시겠습니까?")) {
                 await deletePost(currentMyPostId);
                 myPostModal.style.display = 'none';
             }
         });
-        
-        // 모달 닫기 (X 버튼)
+                // 모달 닫기 (X 버튼)
         myPostModal.querySelector('.close-button').addEventListener('click', () => {
             myPostModal.style.display = 'none';
         });

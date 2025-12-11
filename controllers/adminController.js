@@ -627,17 +627,17 @@ exports.deletePsPost = asyncHandler(async (req, res, next) => {
     try {
         const psPostId = req.params.id;
 
-        // findByIdAndDelete를 findById로 변경하여 삭제 전 데이터를 얻습니다.
+        // findByIdAndDelete 대신 findById를 사용하여 Cloudinary ID를 추출해야 합니다.
         const deletedPost = await PsPost.findById(psPostId);
         
         if (!deletedPost) {
             req.flash('error', '삭제할 P.S. 게시물을 찾을 수 없습니다.');
         } else {
-             // Cloudinary 이미지 삭제 로직 적용
+             // 🚨 FIX 3.2: Cloudinary 삭제 로직 적용
             if (deletedPost.publicId) {
                  await cloudinary.uploader.destroy(deletedPost.publicId);
             } else {
-                // publicId가 누락된 경우 imagePath(URL)에서 public ID 추출하여 삭제 시도
+                // publicId가 없을 경우 URL에서 추출 (이전 버전 호환성)
                 const imagePath = deletedPost.imagePath;
                 if (imagePath && imagePath.startsWith('http')) {
                     const urlParts = imagePath.split('/');
@@ -646,9 +646,24 @@ exports.deletePsPost = asyncHandler(async (req, res, next) => {
                 }
             }
             
-            // DB에서 게시물 및 좋아요 기록 삭제 (PsPost만 해당)
-            await Like.deleteMany({ psPostId: psPostId }); // Like 모델에 psPostId를 사용
+            // 🚨 CRITICAL FIX 3.3: 기존의 로컬 파일 삭제 로직은 모두 제거해야 합니다.
+            /*
+            // 이전 로컬 파일 삭제 로직 예시 (반드시 제거):
+            const imagePath = deletedPost.imagePath.startsWith('/uploads/')
+                ? deletedPost.imagePath.substring('/uploads/'.length)
+                : null;
+            if (imagePath) {
+                const fullPath = `./public/uploads/${imagePath}`;
+                if (fs.existsSync(fullPath)) {
+                    fs.unlinkSync(fullPath);
+                } 
+            }
+            */
+            
+            // DB에서 게시물 및 좋아요 기록 삭제
+            await Like.deleteMany({ psPostId: psPostId }); 
             await PsPost.deleteOne({ _id: psPostId });
+
 
             req.flash('success', 'P.S. 게시물이 성공적으로 삭제되었습니다.');
         }

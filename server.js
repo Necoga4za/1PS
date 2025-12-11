@@ -38,7 +38,7 @@ app.use(session({
     cookie: { maxAge: 60 * 60 * 1000 } // 예시: 1시간
 }));
 
-// ★ 추가: Flash 메시지 미들웨어
+
 app.use(flash());
 
 app.use(methodOverride('_method'));
@@ -52,31 +52,17 @@ app.use((req, res, next) => {
    next();
 });
 
-// =============================================
-// ⭐⭐ 라우터 연결 (깔끔하게 정리) ⭐⭐
-// =============================================
 
-// 1. `/admin` 경로 (가장 먼저 인증/권한이 필요하므로 먼저 배치하는 것이 좋습니다.)
 app.use('/admin', adminRoutes);
 
-// 2. `/` 경로를 포함하는 사용자 및 P.S. 관련 라우트 (psRoutes와 userRoutes가 처리)
-// 메인 페이지 ('/')를 포함하는 라우트가 가장 먼저 실행되도록 psRoutes를 배치합니다.
 app.use('/', psRoutes); 
 
-// 나머지 사용자 관련 라우트 (예: /login, /signup, /logout)
 app.use('/', userRoutes);  
-
-
-// ⭐⭐ 기존의 중복되거나 불필요한 라우트 정의는 모두 삭제합니다. ⭐⭐
-/* app.get('/', (req, res) => { res.redirect('/login'); }); // 👈 삭제!
-app.use('/', userRoutes); // 👈 중복!
-app.use('/admin', adminRoutes); // 👈 중복! 
-*/
 
 
 app.use(errorHandler);
 
 
 app.listen(port, () => {
-    console.log(`1P.S. 서버가 포트 ${port}에서 실행 중입니다.`);
+    console.log(`1P.S. 서버가 포트 ${port}에서 실행 중입니다.`);
 });
