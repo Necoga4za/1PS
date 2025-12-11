@@ -17,15 +17,14 @@ const storage = new CloudinaryStorage({
     params: {
         folder: '1PS_uploads', 
         format: async (req, file) => 'jpeg', 
-        // public_id를 수동으로 생성하는 로직은 CloudinaryStorage가 자동으로 처리하므로
-        // 이 부분을 제거하거나 단순화할 수 있습니다. (현재 코드는 작동함)
+      
         public_id: (req, file) => 'imageFile-' + Date.now() + '-' + Math.round(Math.random() * 1E9), 
     },
 });
 
 const upload = multer({
-    storage: storage, // <-- 여기가 핵심입니다.
-    limits: { fileSize: 10 * 1024 * 1024 }, // 파일 크기 제한 10MB
+    storage: storage, 
+    limits: { fileSize: 10 * 1024 * 1024 }, 
     fileFilter: (req, file, cb) => {
         const filetypes = /jpeg|jpg|png|gif/;
         const mimetype = filetypes.test(file.mimetype);

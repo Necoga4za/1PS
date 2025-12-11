@@ -24,7 +24,6 @@ router.post("/login", loginUser);
 
 
 // --- 공개 라우트 (로그아웃 처리) ---
-// 로그아웃은 토큰을 지우고 로그인 페이지로 이동하는 것이므로 Public으로 유지해야 합니다.
 const logoutUser = (req, res) => {
     res.clearCookie('token'); 
     res.redirect("/login"); 

@@ -31,20 +31,19 @@ const getUploadPage = asyncHandler(async (req, res) => {
 const createPsPost = asyncHandler(async (req, res) => {
     const { postText } = req.body;
     
-    console.log("--- req.file 내용 ---");
-    console.log(req.file);
-    console.log("-----------------------");
 
     if (!req.file || !postText) {
         res.status(400);
-        
-        if (req.file && req.file.filename) { 
-             await cloudinary.uploader.destroy(req.file.filename); 
-             console.log(`Cloudinary 롤백 완료: ${req.file.filename}`);
+
+        const idToDelete = req.file.public_id || req.file.filename;
+        if (req.file && idToDelete) { 
+             await cloudinary.uploader.destroy(idToDelete);
+             console.log(`Cloudinary 롤백 완료: ${idToDelete}`);
         } 
         
         throw new Error("이미지 파일과 텍스트를 모두 입력해야 합니다.");
     }
+
 
     const newPsPost = await PsPost.create({
         userId: req.user.id,
@@ -54,7 +53,7 @@ const createPsPost = asyncHandler(async (req, res) => {
     });
     
     req.flash('success', '새로운 P.S.가 성공적으로 업로드되었습니다.');
-    res.redirect('/'); 
+    res.redirect('/');
 });
 // 내 게시물 목록
 const getMyPosts = asyncHandler(async (req, res) => {
@@ -73,7 +72,6 @@ const getLikesPage = asyncHandler(async (req, res) => {
     const userId = req.user.id;
     
     const likedRecords = await Like.find({ userId: userId }).select('psPostId'); 
-    
     const likedPostIds = likedRecords.map(record => record.psPostId);
     
     if (!likedPostIds.length) {

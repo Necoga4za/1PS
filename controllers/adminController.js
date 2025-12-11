@@ -406,7 +406,7 @@ exports.createUser = asyncHandler(async (req, res) => {
         req.flash('success', `${newUser.name} 님 (이메일: ${newUser.email})이 성공적으로 추가되었습니다.`);
         res.redirect('/admin/users');
     } else {
-        // 생성 실패 시
+        
         req.flash('error', '사용자 추가에 실패했습니다. 다시 시도해 주세요.');
         req.flash('enteredData', { name, email, phone });
         res.redirect('/admin/users/add');
@@ -451,7 +451,7 @@ exports.loginAdmin = async (req, res, next) => {
 
         if (!username || !password) {
             req.flash('error', '이메일과 비밀번호를 모두 입력해주세요.');
-            return res.redirect('/login'); // /login 페이지로 이동
+            return res.redirect('/login'); 
         }
 
 
@@ -479,7 +479,7 @@ exports.loginAdmin = async (req, res, next) => {
             maxAge: 3600000 
         });
 
-        // 5. 관리자
+        
         req.flash('success', `${user.name}님, 로그인했습니다.`);
         res.redirect('/admin'); 
 
@@ -633,11 +633,11 @@ exports.deletePsPost = asyncHandler(async (req, res, next) => {
         if (!deletedPost) {
             req.flash('error', '삭제할 P.S. 게시물을 찾을 수 없습니다.');
         } else {
-             // 🚨 FIX 3.2: Cloudinary 삭제 로직 적용
+  
             if (deletedPost.publicId) {
                  await cloudinary.uploader.destroy(deletedPost.publicId);
             } else {
-                // publicId가 없을 경우 URL에서 추출 (이전 버전 호환성)
+              
                 const imagePath = deletedPost.imagePath;
                 if (imagePath && imagePath.startsWith('http')) {
                     const urlParts = imagePath.split('/');
@@ -646,10 +646,10 @@ exports.deletePsPost = asyncHandler(async (req, res, next) => {
                 }
             }
             
-            // 🚨 CRITICAL FIX 3.3: 기존의 로컬 파일 삭제 로직은 모두 제거해야 합니다.
+          
             /*
-            // 이전 로컬 파일 삭제 로직 예시 (반드시 제거):
-            const imagePath = deletedPost.imagePath.startsWith('/uploads/')
+        :
+         const imagePath = deletedPost.imagePath.startsWith('/uploads/')
                 ? deletedPost.imagePath.substring('/uploads/'.length)
                 : null;
             if (imagePath) {
@@ -660,7 +660,7 @@ exports.deletePsPost = asyncHandler(async (req, res, next) => {
             }
             */
             
-            // DB에서 게시물 및 좋아요 기록 삭제
+            
             await Like.deleteMany({ psPostId: psPostId }); 
             await PsPost.deleteOne({ _id: psPostId });
 

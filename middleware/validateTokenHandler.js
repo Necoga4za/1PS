@@ -3,12 +3,11 @@
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 
-//  1. 로그인이 필수인 경우 (validateToken)
 const validateToken = asyncHandler(async (req, res, next) => {
     let token = req.cookies.token; 
     
     if (!token) {
-        // 토큰이 없으면 로그인 페이지로 리디렉션
+
         const loginRequiredScript = `
             <script>
                 alert('로그인이 필요한 서비스입니다.');
@@ -20,7 +19,7 @@ const validateToken = asyncHandler(async (req, res, next) => {
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
-            // 토큰이 만료되었거나 유효하지 않으면 쿠키 삭제 후 리디렉션
+          
             res.clearCookie('token'); 
             const sessionExpiredScript = `
                 <script>
@@ -37,7 +36,7 @@ const validateToken = asyncHandler(async (req, res, next) => {
 });
 
 
-// 2. 로그인이 선택인 경우 (optionalTokenCheck)
+
 const optionalTokenCheck = asyncHandler(async (req, res, next) => {
     let token = req.cookies.token; 
     
