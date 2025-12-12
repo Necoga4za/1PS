@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('좋아요 요청 중 오류 발생:', error);
-            alert("서버와 통신하는 중 문제가 발생했습니다.");
+            alert("로그인 하신 뒤에 이용 가능합니다.");
         }
     }
 
